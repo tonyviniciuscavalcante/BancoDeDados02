@@ -2475,10 +2475,10 @@ DROP PROCEDURE PR_ALTERA_ATLETA_END_CLUBE;
 CREATE OR REPLACE PROCEDURE PR_SAL_CLUBE(p_clube IN atleta.id_clube%TYPE, p_media_sal OUT number) IS
 BEGIN
     -- Retorna a média salarial dos atletas do clube informado
-    select avg(salario)
+    SELECT avg(salario)
     INTO p_media_sal
     FROM atleta
-    where id_clube = p_clube;
+    WHERE id_clube = p_clube;
 EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('Error: ' || sqlerrm);
