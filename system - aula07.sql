@@ -2587,11 +2587,11 @@ FROM clube;
 que receba por parâmetros o nome de um atleta, uma data inicial e uma
 data final, retornando o valor total (arredondado para 2 casas decimais)
 de premiação ganho por ele nos campeonatos disputados no período
-indicado. A data final poderá ser omiƟda na execução da função e, nesse
+indicado. A data final poderá ser omitida na execução da função e, nesse
 caso, o valor padrão deve ser sysdate. Depois de criada a função, faça
-uma consulta para uƟlizá-la para um atleta já exista na tabela e um
+uma consulta para utilizá-la para um atleta já exista na tabela e um
 período qualquer que desejar informando data inicial e data final, e uma
-outra consulta para uƟlizá-la informando apenas o nome do atleta e uma
+outra consulta para utilizá-la informando apenas o nome do atleta e uma
 data inicial, omiƟndo a data final.
 */
 
@@ -2600,7 +2600,7 @@ data inicial, omiƟndo a data final.
 /*
  2. Crie uma procedure chamada PR_GET_INFO_CLUBE que, dado o nome
 de um clube, devolva como saídas a média de idade dos atletas
-pertencentes ao clube, a folha salarial desse clube e a quanƟdade de
+pertencentes ao clube, a folha salarial desse clube e a quantidade de
 atletas que possui. Depois, monte um bloco PL/SQL para executar essa
 procedure para um clube específico. Por fim, faça um novo bloco PL/SQL
 que chame a procedure para todos os clubes cadastrados.
