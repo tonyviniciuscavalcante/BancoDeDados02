@@ -2511,7 +2511,7 @@ DECLARE
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Valor de v_val1: ' || v_val1 || ', Valor de
     v_val2: ' || v_val2);
-    DBMS_OUTPUT.put_line('Chamando a procedure PR_TROCA_VAL...');
+    DBMS_OUTPUT.PUT_LINE('Chamando a procedure PR_TROCA_VAL...');
     PR_TROCA_VAL(v_val1, v_val2);
     DBMS_OUTPUT.PUT_LINE('Valor de v_val1: ' || v_val1 || ', Valor de
     v_val2: ' || v_val2);
