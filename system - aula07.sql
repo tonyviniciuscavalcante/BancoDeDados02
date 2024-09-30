@@ -2599,16 +2599,16 @@ CREATE OR REPLACE FUNCTION FU_GET_PREMIACAO_ATLETA_PERIODO(
     P_DATA_INICIAL DATE,
     P_DATA_FINAL DATE DEFAULT SYSDATE
 )
-RETURN NUMBER
-IS
+    RETURN NUMBER
+    IS
     V_TOTAL_PREMIACAO NUMBER := 0;
 BEGIN
     -- Consultar o valor total de premiação para o atleta e período
     SELECT ROUND(SUM(P.PREMIACAO), 2)
     INTO V_TOTAL_PREMIACAO
     FROM CAMPEONATO C
-    JOIN ATLETA A ON C.ATLETA_ID = A.ID
-    JOIN PREMIACOES P ON C.CAMPEONATO_ID = P.CAMPEONATO_ID
+             JOIN ATLETA A ON C.ATLETA_ID = A.ID
+             JOIN PREMIACOES P ON C.CAMPEONATO_ID = P.CAMPEONATO_ID
     WHERE A.NOME = P_NOME_ATLETA
       AND C.DATA_CAMPEONATO BETWEEN P_DATA_INICIAL AND P_DATA_FINAL;
 
@@ -2618,7 +2618,8 @@ EXCEPTION
         RETURN 0;
 END;
 
-SELECT FU_GET_PREMIACAO_ATLETA_PERIODO('Nome do Atleta', TO_DATE('2023-01-01', 'YYYY-MM-DD'), TO_DATE('2023-12-31', 'YYYY-MM-DD'))
+SELECT FU_GET_PREMIACAO_ATLETA_PERIODO('Nome do Atleta', TO_DATE('2023-01-01', 'YYYY-MM-DD'),
+                                       TO_DATE('2023-12-31', 'YYYY-MM-DD'))
 FROM DUAL;
 
 SELECT FU_GET_PREMIACAO_ATLETA_PERIODO('Nome do Atleta', TO_DATE('2023-01-01', 'YYYY-MM-DD'))
@@ -2632,6 +2633,86 @@ atletas que possui. Depois, monte um bloco PL/SQL para executar essa
 procedure para um clube específico. Por fim, faça um novo bloco PL/SQL
 que chame a procedure para todos os clubes cadastrados.
 */
+
+CREATE OR REPLACE PROCEDURE PR_GET_INFO_CLUBE(
+    P_NOME_CLUBE IN VARCHAR2,
+    P_MEDIA_IDADE OUT NUMBER,
+    P_FOLHA_SALARIAL OUT NUMBER,
+    P_QUANTIDADE_ATLETAS OUT NUMBER
+)
+    IS
+BEGIN
+    -- Média de idade dos atletas pertencentes ao clube
+    SELECT ROUND(AVG(A.IDADE), 2)
+    INTO P_MEDIA_IDADE
+    FROM ATLETAS A
+             JOIN CLUBES C ON A.CLUBE_ID = C.ID
+    WHERE C.NOME = P_NOME_CLUBE;
+
+    -- Folha salarial do clube (soma dos salários dos atletas)
+    SELECT SUM(A.SALARIO)
+    INTO P_FOLHA_SALARIAL
+    FROM ATLETAS A
+             JOIN CLUBES C ON A.CLUBE_ID = C.ID
+    WHERE C.NOME = P_NOME_CLUBE;
+
+    -- Quantidade de atletas no clube
+    SELECT COUNT(A.ID)
+    INTO P_QUANTIDADE_ATLETAS
+    FROM ATLETAS A
+             JOIN CLUBES C ON A.CLUBE_ID = C.ID
+    WHERE C.NOME = P_NOME_CLUBE;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        P_MEDIA_IDADE := 0;
+        P_FOLHA_SALARIAL := 0;
+        P_QUANTIDADE_ATLETAS := 0;
+END PR_GET_INFO_CLUBE;
+
+
+DECLARE
+    V_MEDIA_IDADE        NUMBER;
+    V_FOLHA_SALARIAL     NUMBER;
+    V_QUANTIDADE_ATLETAS NUMBER;
+BEGIN
+    PR_GET_INFO_CLUBE('Clube Exemplo', V_MEDIA_IDADE, V_FOLHA_SALARIAL, V_QUANTIDADE_ATLETAS);
+
+    DBMS_OUTPUT.PUT_LINE('Média de Idade: ' || V_MEDIA_IDADE);
+    DBMS_OUTPUT.PUT_LINE('Folha Salarial: ' || V_FOLHA_SALARIAL);
+    DBMS_OUTPUT.PUT_LINE('Quantidade de Atletas: ' || V_QUANTIDADE_ATLETAS);
+END;
+
+
+DECLARE
+    CURSOR C_CLUBES IS
+        SELECT NOME
+        FROM CLUBES;
+    V_NOME_CLUBE         CLUBES.NOME%TYPE;
+    V_MEDIA_IDADE        NUMBER;
+    V_FOLHA_SALARIAL     NUMBER;
+    V_QUANTIDADE_ATLETAS NUMBER;
+BEGIN
+    OPEN C_CLUBES;
+    LOOP
+        FETCH C_CLUBES INTO V_NOME_CLUBE;
+        EXIT WHEN C_CLUBES%NOTFOUND;
+
+        -- Chama a procedure para cada clube
+        PR_GET_INFO_CLUBE(V_NOME_CLUBE, V_MEDIA_IDADE, V_FOLHA_SALARIAL, V_QUANTIDADE_ATLETAS);
+
+        -- Exibe os resultados para cada clube
+        DBMS_OUTPUT.PUT_LINE('Clube: ' || V_NOME_CLUBE);
+        DBMS_OUTPUT.PUT_LINE('Média de Idade: ' || V_MEDIA_IDADE);
+        DBMS_OUTPUT.PUT_LINE('Folha Salarial: ' || V_FOLHA_SALARIAL);
+        DBMS_OUTPUT.PUT_LINE('Quantidade de Atletas: ' || V_QUANTIDADE_ATLETAS);
+        DBMS_OUTPUT.PUT_LINE('-------------------------------');
+    END LOOP;
+
+    CLOSE C_CLUBES;
+END;
+/
+
 
 
 
