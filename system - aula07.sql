@@ -2594,6 +2594,30 @@ período qualquer que desejar informando data inicial e data final, e uma
 outra consulta para utilizá-la informando apenas o nome do atleta e uma
 data inicial, omiƟndo a data final.
 */
+CREATE OR REPLACE FUNCTION FU_GET_PREMIACAO_ATLETA_PERIODO(
+    P_NOME_ATLETA VARCHAR2,
+    P_DATA_INICIAL DATE,
+    P_DATA_FINAL DATE DEFAULT SYSDATE
+)
+RETURN NUMBER
+IS
+    V_TOTAL_PREMIACAO NUMBER := 0;
+BEGIN
+    -- Consultar o valor total de premiação para o atleta e período
+    SELECT ROUND(SUM(P.PREMIACAO), 2)
+    INTO V_TOTAL_PREMIACAO
+    FROM CAMPEONATO C
+    JOIN ATLETA A ON C.ATLETA_ID = A.ID
+    JOIN PREMIACOES P ON C.CAMPEONATO_ID = P.CAMPEONATO_ID
+    WHERE A.NOME = P_NOME_ATLETA
+      AND C.DATA_CAMPEONATO BETWEEN P_DATA_INICIAL AND P_DATA_FINAL;
+
+    RETURN NVL(V_TOTAL_PREMIACAO, 0);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END;
+/
 
 
 
