@@ -3316,11 +3316,13 @@ SET sal_anual = 72000
 WHERE id = 21; -- nāo vai rodar pois nāo é possível atualizar por meio de uma visāo assim
 
 CREATE OR REPLACE TRIGGER tr_clube_atleta_sal
-    INSTEAD OF UPDATE ON v_atleta_clube
+    INSTEAD OF UPDATE
+    ON v_atleta_clube
     FOR EACH ROW
 BEGIN
     IF :new.sal_anual <> old.sal_anual THEN
-        UPDATE atleta SET salario = :new.sal_anual/12
+        UPDATE atleta
+        SET salario = :new.sal_anual / 12
         WHERE id = :new.id;
     END IF;
 END tr_clube_atleta_sal;
@@ -3329,3 +3331,26 @@ UPDATE v_atleta_clube
 SET sal_anual = 72000
 WHERE id = 21; -- agora roda pois foi criada a trigger que faz isso
 
+SELECT *
+FROM v_atleta_clube
+WHERE id = 21;
+SELECT *
+FROM atleta
+WHERE id = 21;
+
+-- Para habilitar ou desabilitar um trigger:
+ALTER TRIGGER nome_trigger ENABLE;
+
+-- Para desabilitar um trigger:
+ALTER TRIGGER nome_trigger DISABLE;
+
+-- Para habilitar todos os triggers de uma tabela:
+ALTER TABLE nome_tabela
+    ENABLE ALL TRIGGERS;
+
+-- Para desabilitar todos os triggers de uma tabela:
+ALTER TABLE nome_tabela
+    DISABLE ALL TRIGGERS;
+
+-- Para eliminar um trigger:
+DROP TRIGGER nome_trigger;
