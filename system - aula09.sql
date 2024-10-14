@@ -3187,7 +3187,15 @@ BEGIN
     INSERT INTO audit_atleta_sal VALUES (:new.id, :old.salario, :new.salario, user, sysdate);
 END tr_audit_atleta_sal;
 
+UPDATE atleta
+SET salario = 9000
+WHERE id = 1;
 
+COMMIT;
+
+SELECT *
+FROM atleta
+WHERE id = 1;
 
 
 
