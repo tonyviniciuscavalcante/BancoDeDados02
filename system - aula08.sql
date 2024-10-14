@@ -1,8 +1,7 @@
 ALTER SESSION SET "_ORACLE_SCRIPT"= TRUE
-
-/*************************************************
-*** Elimina??o das tabelas (quando necess?rio) ***
-*************************************************/
+    /*************************************************
+    *** Elimina??o das tabelas (quando necess?rio) ***
+    *************************************************/
 /*
 drop table esporte;
 drop table centro_treinamento;
@@ -18,16 +17,16 @@ drop table atleta_contato;
 drop table atleta;
 */
 
-CREATE TABLE PRESIDENTE
-(
-    id       NUMBER(4),
+    CREATE TABLE PRESIDENTE
+    (
+        id NUMBER(4),
     cpf      VARCHAR2(14) NOT NULL,
     nome     VARCHAR2(50) NOT NULL,
     email    VARCHAR2(80),
     telefone VARCHAR2(20),
     CONSTRAINT presidente_pk PRIMARY KEY (id),
     CONSTRAINT presidente_cpf_uk UNIQUE (nome)
-);
+        );
 
 CREATE TABLE clube
 (
@@ -2066,7 +2065,7 @@ BEGIN
     FROM CLUBE
     WHERE ID = &&v_id;
     DBMS_OUTPUT.PUT_LINE('Id: ' || &&v_id || ', Nome: ' || v_nome || ', Data de fundação: ' ||
-                         TO_CHAR(v_data_fund, 'DD/MM/YYYY'));
+        TO_CHAR(v_data_fund, 'DD/MM/YYYY'));
 END;
 
 -- Tabuada do 5
@@ -2721,20 +2720,25 @@ set serveroutput on;
 --A função deve aplicar o percentual de reajuste ao salário e retornar o novo salário calculado do atleta.
 Depois, atualize o salário de algum atleta utilizando a função criada.*/
 
-CREATE OR REPLACE FUNCTION fu_calcula_reajuste (p_id IN
-     atleta.id%TYPE, p_percentual IN number) RETURN number IS
-     v_salario         atleta.salario%TYPE;
-     v_valor_reajuste  atleta.salario%TYPE;
+CREATE OR REPLACE FUNCTION fu_calcula_reajuste(p_id IN
+                                                   atleta.id%TYPE, p_percentual IN number) RETURN number IS
+    v_salario        atleta.salario%TYPE;
+    v_valor_reajuste atleta.salario%TYPE;
 BEGIN
-     SELECT salario INTO v_salario FROM atleta
-     WHERE id = p_id;
-     v_valor_reajuste := v_salario * (1 + p_percentual/100);
-     RETURN v_valor_reajuste;
+    SELECT salario
+    INTO v_salario
+    FROM atleta
+    WHERE id = p_id;
+    v_valor_reajuste := v_salario * (1 + p_percentual / 100);
+    RETURN v_valor_reajuste;
 END fu_calcula_reajuste;
 
-SELECT id, salario, fu_calcula_reajuste(id, 10) FROM atleta;
+SELECT id, salario, fu_calcula_reajuste(id, 10)
+FROM atleta;
 
-SELECT id, salario, fu_calcula_reajuste(id, 10) FROM atleta where id=13;
+SELECT id, salario, fu_calcula_reajuste(id, 10)
+FROM atleta
+where id = 13;
 
 desc atleta;
 --==========================================================================================================================
@@ -2745,29 +2749,37 @@ Depois, execute a procedure reajustando os salários dos atletas de algum clube.
 
 create or replace procedure PR_REAJUSTA_SAL_CLUBE(p_id IN clube.id%TYPE, p_reajuste IN number) as
 
-cursor c_atletas is select * from atleta where id_clube=p_id;
+    cursor c_atletas is select *
+                        from atleta
+                        where id_clube = p_id;
 begin
-    for reg_atleta in c_atletas loop
-        update atleta set salario= reg_atleta.salario + reg_atleta.salario*p_reajuste/100 where id=reg_atleta.id;
-    end loop;
+    for reg_atleta in c_atletas
+        loop
+            update atleta
+            set salario= reg_atleta.salario + reg_atleta.salario * p_reajuste / 100
+            where id = reg_atleta.id;
+        end loop;
     commit;
 exception
     when others then
-        dbms_output.put_line('Erro: '|| sqlerrm);
+        dbms_output.put_line('Erro: ' || sqlerrm);
         rollback;
 end PR_REAJUSTA_SAL_CLUBE;
 
-select * from atleta where id_clube=1;
+select *
+from atleta
+where id_clube = 1;
 exec PR_REAJUSTA_SAL_CLUBE(1, 10);
 --==========================================================================================================================
 /*3. Faça uma procedure chamada pr_calcula_reajuste2 que transforme a função feita no exercício 1 em uma procedure.
 Acrescente um parâmetro de saída que recebe o novo salário do atleta. Crie um bloco PL/SQL para chamar a procedure.*/
 
-create or replace procedure pr_calcula_reajuste2(p_id IN atleta.id%TYPE, p_percentual IN number, p_novosal OUT atleta.salario%TYPE) as
-     v_salario         atleta.salario%TYPE;
+create or replace procedure pr_calcula_reajuste2(p_id IN atleta.id%TYPE, p_percentual IN number,
+                                                 p_novosal OUT atleta.salario%TYPE) as
+    v_salario atleta.salario%TYPE;
 begin
-    select salario into v_salario from atleta where id=p_id;
-    p_novosal:=v_salario*(1+p_percentual/100);
+    select salario into v_salario from atleta where id = p_id;
+    p_novosal := v_salario * (1 + p_percentual / 100);
 exception
     when no_data_found then
         dbms_output.put_line('Atleta não encontrado!');
@@ -2777,7 +2789,9 @@ exception
 end pr_calcula_reajuste2;
 
 
-select * from atleta where id=20;
+select *
+from atleta
+where id = 20;
 
 declare
     v_novo atleta.salario%TYPE;
@@ -2795,24 +2809,33 @@ A procedure deve permitir que o usuário a execute informando um, dois ou  três
 Exemplo de saída esperada:
 Vagas paraolímpicas para o clube 11: 2*/
 
-CREATE OR REPLACE PROCEDURE PR_VAGAS_PARAOL (p_clube1 IN atleta.id_clube%TYPE,
-     p_clube2 IN atleta.id_clube%TYPE default 0, p_clube3 IN atleta.id_clube%TYPE default 0) IS
-     CURSOR c_vagas IS
-          SELECT id_clube, count(*) AS qtde FROM atleta a, paraolimpico p
-          WHERE id_clube IN (p_clube1, p_clube2, p_clube3) and p.id_atleta = a.id
-          GROUP BY id_clube ORDER BY id_clube;
+CREATE OR REPLACE PROCEDURE PR_VAGAS_PARAOL(p_clube1 IN atleta.id_clube%TYPE,
+                                            p_clube2 IN atleta.id_clube%TYPE default 0,
+                                            p_clube3 IN atleta.id_clube%TYPE default 0) IS
+    CURSOR c_vagas IS
+        SELECT id_clube, count(*) AS qtde
+        FROM atleta a,
+             paraolimpico p
+        WHERE id_clube IN (p_clube1, p_clube2, p_clube3)
+          and p.id_atleta = a.id
+        GROUP BY id_clube
+        ORDER BY id_clube;
 BEGIN
-     FOR r_vagas IN c_vagas LOOP
-          IF r_vagas.id_clube BETWEEN 1 AND 10 THEN
-               DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' || to_char(3 - r_vagas.qtde));
-          ELSIF r_vagas.id_clube BETWEEN 11 AND 20 THEN
-               DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' || to_char(4 - r_vagas.qtde));
-          ELSIF r_vagas.id_clube BETWEEN 21 AND 30 THEN
-               DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' || to_char(5 - r_vagas.qtde));
-          ELSE
-               DBMS_OUTPUT.PUT_LINE('Clube ' || r_vagas.id_clube || ' não encontrado!');
-          END IF;
-     END LOOP;
+    FOR r_vagas IN c_vagas
+        LOOP
+            IF r_vagas.id_clube BETWEEN 1 AND 10 THEN
+                DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' ||
+                                     to_char(3 - r_vagas.qtde));
+            ELSIF r_vagas.id_clube BETWEEN 11 AND 20 THEN
+                DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' ||
+                                     to_char(4 - r_vagas.qtde));
+            ELSIF r_vagas.id_clube BETWEEN 21 AND 30 THEN
+                DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' ||
+                                     to_char(5 - r_vagas.qtde));
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('Clube ' || r_vagas.id_clube || ' não encontrado!');
+            END IF;
+        END LOOP;
 END PR_VAGAS_PARAOL;
 
 EXEC PR_VAGAS_PARAOL (4, 26);
@@ -2827,25 +2850,32 @@ Execute a procedure algumas vezes, informando IDs de clubes distintos, certifica
 create or replace function FU_VAGAS_PARAOL(p_id IN clube.id%TYPE, p_vagas IN number) return number is
 BEGIN
     IF (p_id BETWEEN 1 AND 10) and (p_vagas <= 3) THEN
-            return 3 - p_vagas;
+        return 3 - p_vagas;
     ELSIF (p_id BETWEEN 11 AND 20) and (p_vagas <= 4) THEN
-            return 4 - p_vagas;
+        return 4 - p_vagas;
     ELSIF (p_vagas <= 5) THEN
-            return 5 - p_vagas;
+        return 5 - p_vagas;
     END IF;
 end FU_VAGAS_PARAOL;
 
-CREATE OR REPLACE PROCEDURE PR_VAGAS_PARAOL2 (p_clube1 IN atleta.id_clube%TYPE,
-     p_clube2 IN atleta.id_clube%TYPE default 0, p_clube3 IN atleta.id_clube%TYPE default 0) IS
-     CURSOR c_vagas IS
-          SELECT id_clube, count(*) AS qtde FROM atleta a, paraolimpico p
-          WHERE id_clube IN (p_clube1, p_clube2, p_clube3) and p.id_atleta = a.id
-          GROUP BY id_clube ORDER BY id_clube;
+CREATE OR REPLACE PROCEDURE PR_VAGAS_PARAOL2(p_clube1 IN atleta.id_clube%TYPE,
+                                             p_clube2 IN atleta.id_clube%TYPE default 0,
+                                             p_clube3 IN atleta.id_clube%TYPE default 0) IS
+    CURSOR c_vagas IS
+        SELECT id_clube, count(*) AS qtde
+        FROM atleta a,
+             paraolimpico p
+        WHERE id_clube IN (p_clube1, p_clube2, p_clube3)
+          and p.id_atleta = a.id
+        GROUP BY id_clube
+        ORDER BY id_clube;
 
 BEGIN
-     FOR r_vagas IN c_vagas LOOP
-          DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' || to_char(FU_VAGAS_PARAOL(r_vagas.id_clube, r_vagas.qtde)));
-     END LOOP;
+    FOR r_vagas IN c_vagas
+        LOOP
+            DBMS_OUTPUT.PUT_LINE('Vagas paraolímpicas para o clube ' || r_vagas.id_clube || ': ' ||
+                                 to_char(FU_VAGAS_PARAOL(r_vagas.id_clube, r_vagas.qtde)));
+        END LOOP;
 END PR_VAGAS_PARAOL2;
 
 exec PR_VAGAS_PARAOL2(4);
@@ -2864,18 +2894,21 @@ Clube: Alpha Team
 desc centro_treinamento;
 
 create or replace procedure PR_CLUBE_FONE_CT(p_id IN clube.id%TYPE) is
-    cursor c_centros is select fone from centro_treinamento where id_clube=p_id;
-    v_cont number;
-    nome_clube  clube.nome%TYPE;
+    cursor c_centros is select fone
+                        from centro_treinamento
+                        where id_clube = p_id;
+    v_cont     number;
+    nome_clube clube.nome%TYPE;
 
 begin
-    select nome into nome_clube from clube where id=p_id;
+    select nome into nome_clube from clube where id = p_id;
     dbms_output.put_line('Clube: ' || nome_clube);
-    v_cont:=1;
-    for reg_centro in c_centros loop
-        dbms_output.put_line('Telefone ' || to_char(v_cont) || ':' || reg_centro.fone);
-        v_cont:=v_cont+1;
-    end loop;
+    v_cont := 1;
+    for reg_centro in c_centros
+        loop
+            dbms_output.put_line('Telefone ' || to_char(v_cont) || ':' || reg_centro.fone);
+            v_cont := v_cont + 1;
+        end loop;
 exception
     when no_data_found then
         dbms_output.put_line('Clube não encontrado!');
@@ -2883,9 +2916,16 @@ exception
         dbms_output.put_line('Erro:' || sqlerrm);
 end PR_CLUBE_FONE_CT;
 
-select * from centro_treinamento order by id_clube;
-select nome from clube where id=7;
-select * from centro_treinamento where id_clube=7 order by id_clube;
+select *
+from centro_treinamento
+order by id_clube;
+select nome
+from clube
+where id = 7;
+select *
+from centro_treinamento
+where id_clube = 7
+order by id_clube;
 exec PR_CLUBE_FONE_CT(50);
 
 --==========================================================================================================================
@@ -2904,22 +2944,38 @@ exec PR_CLUBE_FONE_CT(50);
 --    Averill Drogan - 13,7 anos
 
 --Note que o cabeçalho deve aparecer somente uma vez para quem possui mais ou igual a 20 anos de experiência e uma vez apenas para quem possui até 20 anos de experiência na modalidade.
-select a.nome, p.experiencia from atleta a, modalidade m, pratica p where a.id=p.id_atleta and m.id=p.id_modalidade and m.descricao like 'Swimming' order by experiencia desc;
+select a.nome, p.experiencia
+from atleta a,
+     modalidade m,
+     pratica p
+where a.id = p.id_atleta
+  and m.id = p.id_modalidade
+  and m.descricao like 'Swimming'
+order by experiencia desc;
 
-create or replace procedure PR_ATLETA_EXP(p_modalidade IN modalidade.descricao%TYPE, p_exp IN pratica.experiencia%TYPE) is
-    cursor c_modalidade is select a.nome, p.experiencia from atleta a, modalidade m, pratica p where a.id=p.id_atleta and m.id=p.id_modalidade and m.descricao like p_modalidade order by experiencia desc;
-    v_flag number:=0;
+create or replace procedure PR_ATLETA_EXP(p_modalidade IN modalidade.descricao%TYPE,
+                                          p_exp IN pratica.experiencia%TYPE) is
+    cursor c_modalidade is select a.nome, p.experiencia
+                           from atleta a,
+                                modalidade m,
+                                pratica p
+                           where a.id = p.id_atleta
+                             and m.id = p.id_modalidade
+                             and m.descricao like p_modalidade
+                           order by experiencia desc;
+    v_flag number := 0;
 begin
-    for reg_mod in c_modalidade loop
-        if reg_mod.experiencia >= p_exp and v_flag = 0 then
-            dbms_output.put_line('Possuem mais ou igual a ' || to_char(p_exp) || ' anos de experiência:');
-            v_flag:=v_flag+1;
-        elsif reg_mod.experiencia < p_exp and v_flag >= 0 then
-            dbms_output.put_line('Possuem menos que ' || to_char(p_exp) || ' anos de experiência:');
-            v_flag:=-1;
-        end if;
-        dbms_output.put_line(reg_mod.nome || '-' || to_char(reg_mod.experiencia) || ' anos');
-    end loop;
+    for reg_mod in c_modalidade
+        loop
+            if reg_mod.experiencia >= p_exp and v_flag = 0 then
+                dbms_output.put_line('Possuem mais ou igual a ' || to_char(p_exp) || ' anos de experiência:');
+                v_flag := v_flag + 1;
+            elsif reg_mod.experiencia < p_exp and v_flag >= 0 then
+                dbms_output.put_line('Possuem menos que ' || to_char(p_exp) || ' anos de experiência:');
+                v_flag := -1;
+            end if;
+            dbms_output.put_line(reg_mod.nome || '-' || to_char(reg_mod.experiencia) || ' anos');
+        end loop;
 end PR_ATLETA_EXP;
 
 EXEC PR_ATLETA_EXP('Swimming', 20);
@@ -2930,25 +2986,28 @@ EXEC PR_ATLETA_EXP('Running', 18);
 Depois, monte um bloco PL/SQL que chame a procedure criada e imprima na tela o ID do campeonato, seu nome e o total em premiação dada no campeonato.*/
 
 
-CREATE OR REPLACE PROCEDURE PR_PREMIO_CAMP (
+CREATE OR REPLACE PROCEDURE PR_PREMIO_CAMP(
     p_camp IN campeonato.id%type, p_nome OUT campeonato.nome%type,
     p_premiacao OUT number
 ) IS
 BEGIN
-    SELECT c.nome, SUM(p.valor_premiacao) INTO p_nome, p_premiacao
-      FROM participa p JOIN campeonato c
-        ON p.id_campeonato = c.id AND c.id = p_camp
-     GROUP BY c.nome;
+    SELECT c.nome, SUM(p.valor_premiacao)
+    INTO p_nome, p_premiacao
+    FROM participa p
+             JOIN campeonato c
+                  ON p.id_campeonato = c.id AND c.id = p_camp
+    GROUP BY c.nome;
 END PR_PREMIO_CAMP;
 
 DECLARE
-     v_idcamp        campeonato.id%TYPE;
-     v_nomecamp campeonato.nome%TYPE;
-     v_premiacao  number;
+    v_idcamp    campeonato.id%TYPE;
+    v_nomecamp  campeonato.nome%TYPE;
+    v_premiacao number;
 BEGIN
-     v_idcamp := 10;
-     PR_PREMIO_CAMP(v_idcamp, v_nomecamp, v_premiacao);
-     DBMS_OUTPUT.PUT_LINE(' ID do Campeonato: ' || v_idcamp || ', Nome: ' || v_nomecamp || ', Total em Premiação: ' || v_premiacao);
+    v_idcamp := 10;
+    PR_PREMIO_CAMP(v_idcamp, v_nomecamp, v_premiacao);
+    DBMS_OUTPUT.PUT_LINE(' ID do Campeonato: ' || v_idcamp || ', Nome: ' || v_nomecamp || ', Total em Premiação: ' ||
+                         v_premiacao);
 END;
 
 --==========================================================================================================================
@@ -2971,17 +3030,17 @@ CREATE OR REPLACE PROCEDURE PR_ATUALIZA_CLUBE(
 BEGIN
     IF upper(p_modo) = 'A' THEN
         BEGIN
-            SELECT * INTO v_clube FROM clube WHERE id = p_clube;    -- Seleciona a tupla toda referente ao clube
+            SELECT * INTO v_clube FROM clube WHERE id = p_clube; -- Seleciona a tupla toda referente ao clube
             UPDATE clube
-               SET nome = NVL(p_nome, v_clube.nome),
-                      data_fundacao = NVL(p_fundacao, v_clube.data_fundacao),
-                      id_presidente = NVL(p_presidente, v_clube.id_presidente)
-             WHERE id = p_clube;
+            SET nome          = NVL(p_nome, v_clube.nome),
+                data_fundacao = NVL(p_fundacao, v_clube.data_fundacao),
+                id_presidente = NVL(p_presidente, v_clube.id_presidente)
+            WHERE id = p_clube;
             COMMIT;
             DBMS_OUTPUT.PUT_LINE('Clube atualizado com sucesso!');
         EXCEPTION
             WHEN NO_DATA_FOUND THEN
-                INSERT INTO clube VALUES(p_clube, p_nome, p_fundacao, p_presidente);
+                INSERT INTO clube VALUES (p_clube, p_nome, p_fundacao, p_presidente);
                 COMMIT;
                 DBMS_OUTPUT.PUT_LINE('Clube inserido com sucesso!');
         END;
@@ -2993,8 +3052,8 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Modo inválido! Informe A para Atualização ou R para Remoção de um clube');
     END IF;
 EXCEPTION
-     WHEN OTHERS THEN
-          DBMS_OUTPUT.PUT_LINE('Erro: ' || sqlerrm);
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || sqlerrm);
 END PR_ATUALIZA_CLUBE;
 
 EXEC PR_ATUALIZA_CLUBE('A',30,'Teste de nome');
@@ -3013,37 +3072,40 @@ Se o salário anual for menor do que 100.000, o imposto é de 5%.
 Depois, faça uma consulta SQL que retorne o ID, nome, salário, salário anual e o valor do imposto devido pelos atletas.*/
 
 
-CREATE OR REPLACE FUNCTION FU_CALC_IMPOSTO_ATLETA (p_id IN atleta.id%TYPE)
+CREATE OR REPLACE FUNCTION FU_CALC_IMPOSTO_ATLETA(p_id IN atleta.id%TYPE)
     RETURN number IS
     v_sal number;
 BEGIN
-     SELECT salario*12 INTO v_sal FROM atleta WHERE id = p_id;
-     IF v_sal >= 500000 THEN
-         RETURN v_sal * 0.3;
-     ELSIF v_sal >= 250000 THEN
-         RETURN v_sal * 0.2;
-     ELSIF v_sal >= 100000 THEN
-         RETURN v_sal * 0.1;
-     ELSE
-         RETURN v_sal * 0.05;
-     END IF;
+    SELECT salario * 12 INTO v_sal FROM atleta WHERE id = p_id;
+    IF v_sal >= 500000 THEN
+        RETURN v_sal * 0.3;
+    ELSIF v_sal >= 250000 THEN
+        RETURN v_sal * 0.2;
+    ELSIF v_sal >= 100000 THEN
+        RETURN v_sal * 0.1;
+    ELSE
+        RETURN v_sal * 0.05;
+    END IF;
 EXCEPTION
-     WHEN NO_DATA_FOUND THEN
-          DBMS_OUTPUT.PUT_LINE('Atleta não encontrado!');
-     WHEN OTHERS THEN
-         DBMS_OUTPUT.PUT_LINE('Erro! ' || sqlerrm);
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Atleta não encontrado!');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro! ' || sqlerrm);
 END FU_CALC_IMPOSTO_ATLETA;
 
 -- Consulta para mostrar as informações solicitadas:
-SELECT id, nome, salario, round(salario*12,2) AS salario_anual,
-             FU_CALC_IMPOSTO_ATLETA(id) as imposto
- FROM atleta;
+SELECT id,
+       nome,
+       salario,
+       round(salario * 12, 2)     AS salario_anual,
+       FU_CALC_IMPOSTO_ATLETA(id) as imposto
+FROM atleta;
 
 
 -- Solução alternativa criando uma procedure com apenas um parâmetro do tipo IN OUT:
-CREATE OR REPLACE PROCEDURE PR_CALC_IMPOSTO_ATLETA (p_id_imp IN OUT number) IS
+CREATE OR REPLACE PROCEDURE PR_CALC_IMPOSTO_ATLETA(p_id_imp IN OUT number) IS
 BEGIN
-    SELECT salario*12 INTO p_id_imp FROM atleta WHERE id = p_id_imp;
+    SELECT salario * 12 INTO p_id_imp FROM atleta WHERE id = p_id_imp;
     IF p_id_imp >= 500000 THEN
         p_id_imp := p_id_imp * 0.3;
     ELSIF p_id_imp >= 250000 THEN
@@ -3063,12 +3125,12 @@ END PR_CALC_IMPOSTO_ATLETA;
 
 -- Chamando para o atleta de ID para verificar que funciona:
 DECLARE
-     v_aux number;
+    v_aux number;
 BEGIN
-     v_aux := 1;
-     DBMS_OUTPUT.PUT_LINE('Valor de v_aux: ' ||v_aux);
-     pr_calc_imposto_emp(v_aux);
-     DBMS_OUTPUT.PUT_LINE('Valor de v_aux: ' ||v_aux);
+    v_aux := 1;
+    DBMS_OUTPUT.PUT_LINE('Valor de v_aux: ' || v_aux);
+    pr_calc_imposto_emp(v_aux);
+    DBMS_OUTPUT.PUT_LINE('Valor de v_aux: ' || v_aux);
 END;
 
 
