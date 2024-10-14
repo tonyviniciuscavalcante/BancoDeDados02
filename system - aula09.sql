@@ -3328,3 +3328,4 @@ END tr_clube_atleta_sal;
 UPDATE v_atleta_clube
 SET sal_anual = 72000
 WHERE id = 21; -- agora roda pois foi criada a trigger que faz isso
+
