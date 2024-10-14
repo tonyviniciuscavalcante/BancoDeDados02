@@ -3302,3 +3302,13 @@ WHERE id = 30;
 SELECT user, to_char(data_alt, 'dd/mm/yyyy HH:mi:ss') as data_hora, operacao
 FROM modalidade_log;
 
+CREATE OR REPLACE VIEW v_atleta_clube as
+SELECT c.nome         nome_clube,
+       a.id,
+       a.nome         nome_atleta,
+       a.salario * 12 sal_anual
+FROM clube c
+         JOIN atleta a ON c.id = a.id_clube
+ORDER BY c.nome, a.nome;
+
+
