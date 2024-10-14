@@ -3271,4 +3271,34 @@ CREATE TABLE modalidade_log
     CONSTRAINT modalidade_log_pk PRIMARY KEY (usuario, data_alt)
 )
 
+CREATE OR REPLACE TRIGGER tr_modalidade_log_op
+    AFTER INSERT OR DELETE OR UPDATE
+    ON modalidade
+DECLARE
+    v_oper modalidade_log.operacao%type;
+BEGIN
+    IF INSERTING THEN
+        v_oper := 'Inserçāo realizada';
+        ELSEIF UPDATING THEN
+        v_oper := 'Atualizaçāo realizada';
+        ELSEIF DELETING THEN
+        v_oper := 'Remoçāo realizada';
+    END IF;
+    INSERT INTO modalidade_log VALUES (user, sysdate, v_oper);
+END tr_modalidade_log_op;
+
+INSERT INTO modalidade (id, descricao, olimpica)
+VALUES (30, 'Levantamento de Copo', 'S');
+
+COMMIT;
+
+SELECT *
+FROM modalidade_log;
+
+UPDATE modalidade
+SET olimpica = 'N'
+WHERE id = 30;
+
+SELECT user, to_char(data_alt, 'dd/mm/yyyy HH:mi:ss') as data_hora, operacao
+FROM modalidade_log;
 
