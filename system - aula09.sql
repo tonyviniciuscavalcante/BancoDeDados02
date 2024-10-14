@@ -3194,10 +3194,25 @@ WHERE id = 1;
 COMMIT;
 
 SELECT *
-FROM atleta
+FROM audit_atleta_sal;
+/*-------------------*/
+UPDATE atleta
+SET salario = 9000
 WHERE id = 1;
 
+COMMIT;
 
+SELECT *
+FROM audit_atleta_sal;
+/*-------------------*/
+UPDATE atleta
+SET salario = 10000
+WHERE id = 1;
+
+COMMIT;
+
+SELECT *
+FROM audit_atleta_sal;
 
 
 
