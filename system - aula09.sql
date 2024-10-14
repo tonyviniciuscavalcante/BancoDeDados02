@@ -3354,3 +3354,40 @@ ALTER TABLE nome_tabela
 
 -- Para eliminar um trigger:
 DROP TRIGGER nome_trigger;
+
+/*------------ Exercícios ------------*/
+/*1. Considere as seguintes tabelas de um banco de dados relacional:
+Cliente (cod, nome, qtde_locacoes)
+Aluguel (nro, cod_cli, cod_filme, data_hora_emp, data_hora_dev)
+Filme (cod, Ɵtulo, classificacao, qtde_locacoes)
+
+
+Crie as tabelas acima, definindo Ɵpos e constraints adequadas. Coloque o valor default
+0 para qtde_locações nas tabelas e sysdate para data_hora_emp na tabela Aluguel.
+Os atributos qtde_locacoes são atributos derivados e devem ser atualizados por meio
+de triggers.
+
+O valor do atributo data_hora_dev deve ser atualizado conforme a classificação do
+filme - Lançamento (1 dia) ou Normal (2 dias). Desenvolva um gaƟlho para gerar
+corretamente este valor.
+
+Teste os gatilhos por meio de inserções de dados na tabela Aluguel. Consulte todas as
+tabelas para saber se funcionou.*/
+
+
+
+
+/*2. Considere as seguintes tabelas de um banco de dados relacional:
+Conta (nro_conta, nome_cliente, saldo)
+Movimentacao (nro_conta,data_mov, Ɵpo, valor)
+
+Crie as tabelas acima, definindo Ɵpos e constraints adequadas. Faça
+uma check que permita somente ‘D’ ou ‘C’ para o Ɵpo de
+movimentação referente a débito ou crédito, além de outra check que
+verifique se o valor da movimentação é maior do que 0.
+
+Se a movimentação for um crédito, o valor deve ser adicionado ao
+saldo da conta. Se for um débito, deve ser subtraído do saldo.
+
+Teste os gaƟlhos por meio de inserções de dados na tabela
+Movimentação. Consulte as tabelas para saber se funcionou.*/
