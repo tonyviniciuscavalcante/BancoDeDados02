@@ -3249,4 +3249,26 @@ VALUES (119, 'Fernanda Venturini', '111-22-9876', 20000, to_date('21-09-1981', '
 SELECT *
 FROM clube;
 
+DELETE
+FROM atleta
+WHERE id = 119;
+
+SELECT *
+FROM clube;
+
+INSERT INTO atleta (id, nome, cpf, salario, datanasc, id_clube)
+VALUES (121, 'Myke Tyson', '888-22-3333', 60000, to_date('01-04-1975', 'dd-mm-yyyy'), 5);
+
+INSERT INTO atleta (id, nome, cpf, salario, datanasc, id_clube)
+VALUES (122, 'Xuxa', '999-11-4321', 10000, to_date('27-03-1963', 'dd-mm-yyyy'), 5);
+
+
+CREATE TABLE modalidade_log
+(
+    usuario  VARCHAR2(20),
+    data_alt TIMESTAMP,
+    operacao VARCHAR2(30),
+    CONSTRAINT modalidade_log_pk PRIMARY KEY (usuario, data_alt)
+)
+
 
