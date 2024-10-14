@@ -3240,7 +3240,13 @@ BEGIN
     END IF;
 END tr_set_qtde_atletas_clube;
 
+SELECT *
+FROM clube;
 
+INSERT INTO atleta (id, nome, cpf, salario, datanasc, id_clube)
+VALUES (119, 'Fernanda Venturini', '111-22-9876', 20000, to_date('21-09-1981', 'dd-mm-yyyy'), 3);
 
+SELECT *
+FROM clube;
 
 
