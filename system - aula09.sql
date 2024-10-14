@@ -3224,6 +3224,22 @@ SET c.qtde_atletas = (SELECT count(*)
 
 COMMIT;
 
+CREATE OR REPLACE TRIGGER tr_set_qtde_atletas_clube
+    BEFORE INSERT OR DELETE
+    ON atleta
+    FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        UPDATE clube
+        SET qtde_atletas = qtde_atletas + 1
+        WHERE id = :new.id_clube;
+        ELSEIF DELETING THEN
+        UPDATE clube
+        SET qtde_atletas = qtde_atletas - 1
+        WHERE id = :old.id_clube;
+    END IF;
+END tr_set_qtde_atletas_clube;
+
 
 
 
