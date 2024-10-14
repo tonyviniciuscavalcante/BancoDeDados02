@@ -3176,7 +3176,16 @@ CREATE TABLE audit_atleta_sal
         REFERENCES atleta (id)
 )
 
-
+CREATE OR REPLACE TRIGGER tr_audit_atleta_sal
+    BEFORE UPDATE OF salario
+    ON atleta
+    FOR EACH ROW
+    WHEN (new.salario <> old.salario)
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Salário antigo: ' || old.salario);
+    DBMS_OUTPUT.PUT_LINE('Salário novo: ' || new.salario);
+    INSERT INTO audit_atleta_sal VALUES (:new.id, :old.salario, :new.salario, user, sysdate);
+END tr_audit_atleta_sal;
 
 
 
