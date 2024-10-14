@@ -3214,7 +3214,15 @@ COMMIT;
 SELECT *
 FROM audit_atleta_sal;
 
+ALTER TABLE clube
+    ADD qtde_atletas NUMBER DEFAULT 0;
 
+UPDATE clube c
+SET c.qtde_atletas = (SELECT count(*)
+                      FROM atleta a
+                      WHERE a.id_clube = c.id);
+
+COMMIT;
 
 
 
