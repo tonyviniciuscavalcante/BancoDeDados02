@@ -3576,14 +3576,20 @@ CREATE INDEX pessoa_nome_ix ON pessoa(nome);
 SELECT * FROM pessoa WHERE nome = 'Joao 062000';
 
 SELECT * FROM pessoa WHERE sexo = 'M';
-
 CREATE INDEX pessoa_sexo_ix ON pessoa(sexo);
 
 SELECT p.nome, c.descricao FROM pessoa p, categoria c WHERE p.categ_id = c.categ_id;
 SELECT p.nome, c.descricao FROM pessoa p, categoria c WHERE p.categ_id = c.categ_id and p.categ_id = 12;
 
 SELECT * FROM pessoa WHERE UPPER(nome) = 'Joao 062000';
-
 CREATE INDEX pessoa_nome2_ix ON pessoa(UPPER(nome));
 SELECT * FROM pessoa WHERE UPPER(nome) = 'Joao 062000';
+
+SELECT * FROM pessoa WHERE categ_id = 1 AND nome LIKE 'Joao 09%';
+CREATE INDEX pessoa-cat_nome_id ON pessoa(categ_id, nome);
+SELECT * FROM pessoa WHERE categ_id = 1 AND nome LIKE 'Joao 09%';
+
+SELECT * FROM pessoa WHERE cor_olhos = 'A';
+CREATE BITMAP INDEX pessoa_olhos_bmix ON pessoa(cor_olhos);
+SELECT * FROM pessoa WHERE cor_olhos = 'A';
 
