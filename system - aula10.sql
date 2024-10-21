@@ -3375,8 +3375,6 @@ Teste os gatilhos por meio de inserções de dados na tabela Aluguel. Consulte t
 tabelas para saber se funcionou.*/
 
 
-
-
 /*2. Considere as seguintes tabelas de um banco de dados relacional:
 Conta (nro_conta, nome_cliente, saldo)
 Movimentacao (nro_conta,data_mov, Ɵpo, valor)
@@ -3393,3 +3391,21 @@ Teste os gaƟlhos por meio de inserções de dados na tabela
 Movimentação. Consulte as tabelas para saber se funcionou.*/
 
 
+/*---------------- Packages e índices ----------------*/
+
+CREATE OR REPLACE PACKAGE Esporte_Pkg as
+    FUNCTION Get_Atletas_Clube(p_id_clube IN NUMBER)
+        RETURN SYS_REFCURSOR;
+
+    FUNCTION Count_Modalidade_By_Atleta(p_id_atleta IN NUMBER)
+        RETURN NUMBER;
+
+    PROCEDURE Add_Atleta(P_id IN atleta.id%TYPE,
+                         p_nome IN atleta.nome%TYPE, p_cpf IN atleta.cpf%TYPE,
+                         p_salario IN atleta.salario%type,
+                         p_id_clube IN atleta.id_clube%TYPE);
+
+    PROCEDURE Add_Clube(p_id IN clube.id%TYPE,
+                        p_nome IN clube.nome%TYPE,
+                        p_id_presidente IN clube.id_presidente%TYPE);
+END Esporte_Pkg;
