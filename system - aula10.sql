@@ -3412,184 +3412,250 @@ END Esporte_Pkg;
 
 
 CREATE OR REPLACE PACKAGE BODY Esporte_Pkg AS
-    FUNCTION Get_Atleta_By_Clube(p_id IN NUMBER) RETURN SYS_REFCURSOR IS
-        c_atleta SYS_REFCURSOR
+    -- FuncƟon para obter os atletas de um clube
+    FUNCTION Get_Atletas_By_Clube(p_id_clube IN NUMBER) RETURN SYS_REFCURSOR IS
+        c_atletas SYS_REFCURSOR;
     BEGIN
-        OPEN c_atleta FOR
-            SELECT a.id, a.nome, a.salario, a.dataNasc
-            FROM atleta a
-            WHERE a.id_clube = p.id_clube;
+        OPEN c_atletas FOR
+            SELECT a.id, a.nome, a.salario, a.datanasc
+            FROM Atleta a
+            WHERE a.id_clube = p_id_clube;
 
-        RETURN c_atleta
-    END Get_Atleta_By_Clube;
-
-    FUNCTION Count_Modalidade_By_Atleta(id_atleta IN NUMBER) RETURN NUMBER IS
-        x_count NUMBER
+        RETURN c_atletas;
+    END Get_Atletas_By_Clube;
+    -- FuncƟon para contar o número de modalidades que um atleta praƟca
+    FUNCTION Count_Modalidades_By_Atleta(p_id_atleta IN NUMBER) RETURN NUMBER IS
+        v_count NUMBER;
     BEGIN
+        SELECT COUNT(*)
+        INTO v_count
+        FROM PraƟca
+        WHERE id_atleta = p_id_atleta;
+        RETURN v_count;
+    END Count_Modalidades_By_Atleta;
 
-    END Count_Modalidade_By_Atleta;
 
-
+    -- Procedure para adicionar um atleta
     PROCEDURE Add_Atleta(
-        p_id IN atleta.id%TYPE, p_nome IN atleta.nome%TYPE,
-        p_cpf IN atleta.cpf%TYPE, p_salario IN atleta.salario%TYPE,
-        p_id_clube IN atleta.id_clube%TYPE
-    ) IS
+        p_id IN atleta.id%type, p_nome IN atleta.nome%type,
+        p_cpf IN atleta.cpf%type, p_salario IN atleta.salario%type,
+        p_id_clube IN atleta.id_clube%type) IS
     BEGIN
-        INSERT INTO Atleta (id nome, cpf, salario, id_clube)
-        VALUES (p_id, p_cpf, p_salario, p_id_clube, p_nome);
+        INSERT INTO Atleta (id, nome, cpf, salario, id_clube)
+        VALUES (p_id, p_nome, p_cpf, p_salario, p_id_clube);
     END Add_Atleta;
+    -- Procedure para adicionar um clube
+    PROCEDURE Add_Clube(p_id IN clube.id%type, p_nome IN clube.nome%type,
+                        p_id_presidente IN clube.id_presidente%type) IS
+    BEGIN
+        INSERT INTO Clube (id, nome, id_presidente)
+        VALUES (p_id, p_nome, p_id_presidente);
+    END Add_Clube;
+END Esporte_Pkg;
 
-    PROCEDURE Add_Clube_id IN
-    clube.id%
-    TYPE
-        DECLARE
-    v_atleta SYS_REFCURSOR,
-    v_id_atleta NUMBER,
-    v_nome_atleta VARCHAR2(100) ,
-    v_salario NUMBER,
-    v_datanasc DATE
+DECLARE
+    v_atletas     SYS_REFCURSOR;
+    v_id_atleta   NUMBER;
+    v_nome_atleta VARCHAR2(100);
+    v_salario     NUMBER;
+    v_datanasc    DATE;
 BEGIN
-    v_atleta
+    -- Chama a função para obter os atletas de um clube específico
+    v_atletas := Esporte_Pkg.Get_Atletas_By_Clube(1);
+    -- Ex: Clube com ID 1
+    -- Loop para ler os resultados do cursor
+    LOOP
+        FETCH v_atletas INTO v_id_atleta, v_nome_atleta, v_salario, v_datanasc;
+        EXIT WHEN v_atletas%NOTFOUND;
 
+        -- Exibe os resultados
+        DBMS_OUTPUT.PUT_LINE('ID Atleta: ' || v_id_atleta || ', Nome: ' || v_nome_atleta || ', Salário: ' ||
+                             v_salario ||
+                             ', Data de Nascimento: ' || v_datanasc);
+    END LOOP;
+    -- Fecha o cursor
+    CLOSE v_atletas;
+END;
 
-    DECLARE
-        v_qtd_modalidades NUMBER;
-    BEGIN
-        v_qtd_modalidades := Esporte_Pkg.Count_Modalidade_By_Atleta(1);
+DECLARE
+    v_qtd_modalidades NUMBER;
+BEGIN
+    -- Chama a função para contar modalidades de um atleta específico
+    -- Exemplo: Atleta com ID 1
+    v_qtd_modalidades := Esporte_Pkg.Count_Modalidades_By_Atleta(1);
 
-        DBMS_OUTPUT.PUT_LINE('O atleta pratica' || v_qtd_modalidades || 'modalidades');
-    END;
+    -- Exibe o resultado
+    DBMS_OUTPUT.PUT_LINE('O atleta praƟca ' || v_qtd_modalidades ||
+                         ' modalidades.');
+END;
 
+BEGIN
+    -- Adiciona um novo atleta ao clube com ID 111
+    Esporte_Pkg.Add_Atleta(111, 'Carlos Pereira', '525-6548-784',
+                           8720, 8);
+    DBMS_OUTPUT.PUT_LINE('Novo atleta adicionado com sucesso.');
+END;
+Chamando a procedure Add_Clube da package Esporte_Pkg:
+BEGIN
+    -- Adiciona um novo clube com o presidente de ID 5
+    -- Nome do clube: Clube Olímpico, Presidente ID: 5
+    Esporte_Pkg.Add_Clube(41, 'São Carlos Clube', 5);
 
-    BEGIN
-        Esporte_Pkg.Add_Atleta(111, 'Carlos Pereira', '525-6548-784', 8720, 8);
-        DBMS_OUTPUT.PUT_LINE('Novo atleta adicionado com sucesso';
-    END;
+    DBMS_OUTPUT.PUT_LINE('Novo clube adicionado com sucesso.');
+END;
 
+ALTER PACKAGE Esporte_Pkg COMPILE;
 
-    BEGIN
-        Esporte_Pkg.Add_Clube(41, 'Sāo Carlos Clube', 5);
-        DBMS_OUTPUT.PUT_LINE('Novo clube adicionado com sucesso');
-    END;
+ALTER PACKAGE Esporte_Pkg COMPILE BODY;
 
 
 /* Índices */
 set serveroutput on
 
-create table pessoa(
-  id        number,
-  nome      varchar2(30),
-  sexo      char(1),
-  cor_olhos char(1),
-  categ_id  number(2),
-  constraint pessoa_pk primary key(id)
+create table pessoa
+(
+    id        number,
+    nome      varchar2(30),
+    sexo      char(1),
+    cor_olhos char(1),
+    categ_id  number(2),
+    constraint pessoa_pk primary key (id)
 );
 
-    create
+create
     table
-    categoria(
-            categ_id number(2),
-            descricao varchar2(20),
-            constraint categoria_pk primary key(categ_id)
-    );
+    categoria
+(
+    categ_id  number(2),
+    descricao varchar2(20),
+    constraint categoria_pk primary key (categ_id)
+);
 
-    alter
+alter
     table
-    pessoa add constraint pessoa_categ_fk foreign key(categ_id) references categoria(categ_id);
+    pessoa
+    add constraint pessoa_categ_fk foreign key (categ_id) references categoria (categ_id);
 
-    begin
-        dbms_output.put_line('Populando a tabela Categoria...');
-        insert into categoria values (1, 'Nivel A');
-        insert into categoria values (2, 'Nivel B');
-        insert into categoria values (3, 'Nivel C');
-        insert into categoria values (4, 'Nivel D');
-        insert into categoria values (5, 'Nivel E');
-        insert into categoria values (6, 'Nivel F');
-        insert into categoria values (7, 'Nivel G');
-        insert into categoria values (8, 'Nivel H');
-        insert into categoria values (9, 'Nivel I');
-        insert into categoria values (10, 'Nivel J');
-        insert into categoria values (11, 'Nivel K');
-        insert into categoria values (12, 'Nivel L');
-        insert into categoria values (13, 'Nivel M');
-        insert into categoria values (14, 'Nivel N');
-        insert into categoria values (15, 'Nivel O');
-        insert into categoria values (16, 'Nivel P');
-        insert into categoria values (17, 'Nivel Q');
-        insert into categoria values (18, 'Nivel R');
-        insert into categoria values (19, 'Nivel S');
-        insert into categoria values (20, 'Nivel T');
-        commit;
+begin
+    dbms_output.put_line('Populando a tabela Categoria...');
+    insert into categoria values (1, 'Nivel A');
+    insert into categoria values (2, 'Nivel B');
+    insert into categoria values (3, 'Nivel C');
+    insert into categoria values (4, 'Nivel D');
+    insert into categoria values (5, 'Nivel E');
+    insert into categoria values (6, 'Nivel F');
+    insert into categoria values (7, 'Nivel G');
+    insert into categoria values (8, 'Nivel H');
+    insert into categoria values (9, 'Nivel I');
+    insert into categoria values (10, 'Nivel J');
+    insert into categoria values (11, 'Nivel K');
+    insert into categoria values (12, 'Nivel L');
+    insert into categoria values (13, 'Nivel M');
+    insert into categoria values (14, 'Nivel N');
+    insert into categoria values (15, 'Nivel O');
+    insert into categoria values (16, 'Nivel P');
+    insert into categoria values (17, 'Nivel Q');
+    insert into categoria values (18, 'Nivel R');
+    insert into categoria values (19, 'Nivel S');
+    insert into categoria values (20, 'Nivel T');
+    commit;
 
-        dbms_output.put_line('Iniciando a carga de dados da tabela Pessoa...');
-        for i in 1..100000
-            loop
-                insert into pessoa(id, nome) values (i, 'Joao' || to_char(i, '000000'));
-                if mod(i, 10000) = 0 then
-                    commit;
-                end if;
-            end loop;
-        commit;
-        dbms_output.put_line('Carga de dados da tabela Pessoa conclu�da com sucesso!');
+    dbms_output.put_line('Iniciando a carga de dados da tabela Pessoa...');
+    for i in 1..100000
+        loop
+            insert into pessoa(id, nome) values (i, 'Joao' || to_char(i, '000000'));
+            if mod(i, 10000) = 0 then
+                commit;
+            end if;
+        end loop;
+    commit;
+    dbms_output.put_line('Carga de dados da tabela Pessoa conclu�da com sucesso!');
 
-        dbms_output.put_line('Atualizando a coluna cor dos olhos...');
-        update pessoa set cor_olhos = 'A' where mod(id, 4) = 0;
-        update pessoa set cor_olhos = 'V' where mod(id, 4) = 1;
-        update pessoa set cor_olhos = 'C' where mod(id, 4) = 2;
-        update pessoa set cor_olhos = 'P' where mod(id, 4) = 3;
-        commit;
-        dbms_output.put_line('Atualizando a coluna sexo...');
-        update pessoa set sexo = 'M' where mod(id, 2) = 0;
-        update pessoa set sexo = 'F' where mod(id, 2) = 1;
-        commit;
-        dbms_output.put_line('Atualizando a coluna categ_id...');
-        update pessoa set categ_id = 1 where mod(id, 20) = 0;
-        update pessoa set categ_id = 2 where mod(id, 20) = 1;
-        update pessoa set categ_id = 3 where mod(id, 20) = 2;
-        update pessoa set categ_id = 4 where mod(id, 20) = 3;
-        update pessoa set categ_id = 5 where mod(id, 20) = 4;
-        update pessoa set categ_id = 6 where mod(id, 20) = 5;
-        update pessoa set categ_id = 7 where mod(id, 20) = 6;
-        update pessoa set categ_id = 8 where mod(id, 20) = 7;
-        update pessoa set categ_id = 9 where mod(id, 20) = 8;
-        update pessoa set categ_id = 10 where mod(id, 20) = 9;
-        update pessoa set categ_id = 11 where mod(id, 20) = 10;
-        update pessoa set categ_id = 12 where mod(id, 20) = 11;
-        update pessoa set categ_id = 13 where mod(id, 20) = 12;
-        update pessoa set categ_id = 14 where mod(id, 20) = 13;
-        update pessoa set categ_id = 15 where mod(id, 20) = 14;
-        update pessoa set categ_id = 16 where mod(id, 20) = 15;
-        update pessoa set categ_id = 17 where mod(id, 20) = 16;
-        update pessoa set categ_id = 18 where mod(id, 20) = 17;
-        update pessoa set categ_id = 19 where mod(id, 20) = 18;
-        update pessoa set categ_id = 20 where mod(id, 20) = 19;
-        commit;
-        dbms_output.put_line('Script executado com sucesso');
-    end;
+    dbms_output.put_line('Atualizando a coluna cor dos olhos...');
+    update pessoa set cor_olhos = 'A' where mod(id, 4) = 0;
+    update pessoa set cor_olhos = 'V' where mod(id, 4) = 1;
+    update pessoa set cor_olhos = 'C' where mod(id, 4) = 2;
+    update pessoa set cor_olhos = 'P' where mod(id, 4) = 3;
+    commit;
+    dbms_output.put_line('Atualizando a coluna sexo...');
+    update pessoa set sexo = 'M' where mod(id, 2) = 0;
+    update pessoa set sexo = 'F' where mod(id, 2) = 1;
+    commit;
+    dbms_output.put_line('Atualizando a coluna categ_id...');
+    update pessoa set categ_id = 1 where mod(id, 20) = 0;
+    update pessoa set categ_id = 2 where mod(id, 20) = 1;
+    update pessoa set categ_id = 3 where mod(id, 20) = 2;
+    update pessoa set categ_id = 4 where mod(id, 20) = 3;
+    update pessoa set categ_id = 5 where mod(id, 20) = 4;
+    update pessoa set categ_id = 6 where mod(id, 20) = 5;
+    update pessoa set categ_id = 7 where mod(id, 20) = 6;
+    update pessoa set categ_id = 8 where mod(id, 20) = 7;
+    update pessoa set categ_id = 9 where mod(id, 20) = 8;
+    update pessoa set categ_id = 10 where mod(id, 20) = 9;
+    update pessoa set categ_id = 11 where mod(id, 20) = 10;
+    update pessoa set categ_id = 12 where mod(id, 20) = 11;
+    update pessoa set categ_id = 13 where mod(id, 20) = 12;
+    update pessoa set categ_id = 14 where mod(id, 20) = 13;
+    update pessoa set categ_id = 15 where mod(id, 20) = 14;
+    update pessoa set categ_id = 16 where mod(id, 20) = 15;
+    update pessoa set categ_id = 17 where mod(id, 20) = 16;
+    update pessoa set categ_id = 18 where mod(id, 20) = 17;
+    update pessoa set categ_id = 19 where mod(id, 20) = 18;
+    update pessoa set categ_id = 20 where mod(id, 20) = 19;
+    commit;
+    dbms_output.put_line('Script executado com sucesso');
+end;
 
-SELECT * FROM pessoa WHERE nome = 'Joao 062000';
+SELECT *
+FROM pessoa
+WHERE nome = 'Joao 062000';
 
-SELECT * FROM pessoa;
+SELECT *
+FROM pessoa;
 
-CREATE INDEX pessoa_nome_ix ON pessoa(nome);
-SELECT * FROM pessoa WHERE nome = 'Joao 062000';
+CREATE INDEX pessoa_nome_ix ON pessoa (nome);
+SELECT *
+FROM pessoa
+WHERE nome = 'Joao 062000';
 
-SELECT * FROM pessoa WHERE sexo = 'M';
-CREATE INDEX pessoa_sexo_ix ON pessoa(sexo);
+SELECT *
+FROM pessoa
+WHERE sexo = 'M';
+CREATE INDEX pessoa_sexo_ix ON pessoa (sexo);
 
-SELECT p.nome, c.descricao FROM pessoa p, categoria c WHERE p.categ_id = c.categ_id;
-SELECT p.nome, c.descricao FROM pessoa p, categoria c WHERE p.categ_id = c.categ_id and p.categ_id = 12;
+SELECT p.nome, c.descricao
+FROM pessoa p,
+     categoria c
+WHERE p.categ_id = c.categ_id;
+SELECT p.nome, c.descricao
+FROM pessoa p,
+     categoria c
+WHERE p.categ_id = c.categ_id
+  and p.categ_id = 12;
 
-SELECT * FROM pessoa WHERE UPPER(nome) = 'Joao 062000';
-CREATE INDEX pessoa_nome2_ix ON pessoa(UPPER(nome));
-SELECT * FROM pessoa WHERE UPPER(nome) = 'Joao 062000';
+SELECT *
+FROM pessoa
+WHERE UPPER(nome) = 'Joao 062000';
+CREATE INDEX pessoa_nome2_ix ON pessoa (UPPER(nome));
+SELECT *
+FROM pessoa
+WHERE UPPER(nome) = 'Joao 062000';
 
-SELECT * FROM pessoa WHERE categ_id = 1 AND nome LIKE 'Joao 09%';
-CREATE INDEX pessoa-cat_nome_id ON pessoa(categ_id, nome);
-SELECT * FROM pessoa WHERE categ_id = 1 AND nome LIKE 'Joao 09%';
+SELECT *
+FROM pessoa
+WHERE categ_id = 1
+  AND nome LIKE 'Joao 09%';
+CREATE INDEX pessoa_cat_nome_id ON pessoa (categ_id, nome);
+SELECT *
+FROM pessoa
+WHERE categ_id = 1
+  AND nome LIKE 'Joao 09%';
 
-SELECT * FROM pessoa WHERE cor_olhos = 'A';
-CREATE BITMAP INDEX pessoa_olhos_bmix ON pessoa(cor_olhos);
-SELECT * FROM pessoa WHERE cor_olhos = 'A';
+SELECT *
+FROM pessoa
+WHERE cor_olhos = 'A';
+CREATE BITMAP INDEX pessoa_olhos_bmix ON pessoa (cor_olhos);
+SELECT *
+FROM pessoa
+WHERE cor_olhos = 'A';
 
