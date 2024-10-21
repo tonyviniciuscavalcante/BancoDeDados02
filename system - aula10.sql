@@ -3409,3 +3409,23 @@ CREATE OR REPLACE PACKAGE Esporte_Pkg as
                         p_nome IN clube.nome%TYPE,
                         p_id_presidente IN clube.id_presidente%TYPE);
 END Esporte_Pkg;
+
+
+CREATE OR REPLACE PACKAGE BODY Esporte_Pkg AS
+    FUNCTION Get_Atleta_By_Clube(p_id IN NUMBER) RETURN SYS_REFCURSOR IS
+    c_atleta SYS_REFCURSOR
+    BEGIN
+        OPEN c_atleta FOR
+            SELECT a.id, a.nome, a.salario, a.dataNasc
+                FROM atleta a
+        WHERE a.id_clube = p.id_clube;
+
+        RETURN c_atleta
+    END Get_Atleta_By_Clube;
+
+FUNCTION Count_Modalidade_By_Atleta(id_atleta IN NUMBER) RETURN NUMBER IS x_count NUMBER
+BEGIN
+
+END Count_Modalidade_By_Atleta;
+
+
