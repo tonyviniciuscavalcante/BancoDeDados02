@@ -3677,3 +3677,61 @@ ALTER INDEX nome_índice RENAME TO novo_nome_índice;
 ALTER INDEX nome_índice REBUILD;
 -- Para eliminar um índice, uƟlizamos o comando:
 DROP INDEX nome_índice;
+
+/* Exercícios */
+/*Faça os comandos para as consultas abaixo, rode seus planos de
+explicação e verifique se é possível melhorar o desempenho delas. Se
+for, o que faria para melhorar?*/
+
+/* 1. Liste o ID e nome dos atletas que pertencem ao clube 10. */
+
+/* 2. Liste todas as colunas dos atletas com menos de 20 anos de idade. */
+
+/* 3. Liste o nome do clube, o nome de seu presidente e a data de
+fundação do clube 30. */
+
+/* 4. Liste o nome do clube e todas as colunas de seus centros de
+treinamento para o clube Alpha Team. */
+
+/* 5. Liste os atletas do sexo masculino. */
+
+/* 6. Liste todas as colunas do atleta de nome PERNELL BOORER. A
+consulta deve aplicar a função UPPER na comparação do nome. */
+
+/* 7. Liste o ID do clube e a quanƟdade de centros de treinamento
+existentes para cada clube. */
+
+/* 8. Liste todas as colunas dos atletas que ganham entre 40000 e
+50000 e que nasceram depois de 1 de janeiro de 1990. */
+
+/* Exercícios - Packages */
+
+/*
+1. Crie uma tabela chamada Produto que contenha 3 colunas: id, nome
+e preço. Em seguida, crie uma package chamada Produto_Pkg que
+contenha:
+- Um procedimento CadastrarProduto que receba como parâmetros
+o nome e o preço de um produto e insira esses valores na tabela
+Produto.
+- Uma função que retorne a quanƟdade de produtos cadastrados na
+tabela.
+- Teste a package montando um programa em PL/SQL que uƟlize o
+procedimento para inserir algumas produtos e depois a função para
+exibir a quanƟdade de produtos cadastrados.
+*/
+
+
+
+/*
+2. Considerando a tabela Atleta, crie uma package Atleta_Pkg que
+contenha:
+- Uma função CalcularSalario que receba por parâmetros o ID do
+atleta e um valor de bônus. A função deve retornar o salário do
+atleta somado ao bônus passado por parâmetro.
+- Uma função Get_Clube que recebe o ID do atleta por parâmetro e
+retorna o nome do clube a que ele pertence. Caso não pertença a
+nenhum clube, a função deve retornar ‘Sem contrato’.
+- Teste a package montando um programa em PL/SQL que uƟlize as
+suas funções especificadas.
+*/
+
