@@ -3568,4 +3568,22 @@ create table pessoa(
         dbms_output.put_line('Script executado com sucesso');
     end;
 
+SELECT * FROM pessoa WHERE nome = 'Joao 062000';
+
+SELECT * FROM pessoa;
+
+CREATE INDEX pessoa_nome_ix ON pessoa(nome);
+SELECT * FROM pessoa WHERE nome = 'Joao 062000';
+
+SELECT * FROM pessoa WHERE sexo = 'M';
+
+CREATE INDEX pessoa_sexo_ix ON pessoa(sexo);
+
+SELECT p.nome, c.descricao FROM pessoa p, categoria c WHERE p.categ_id = c.categ_id;
+SELECT p.nome, c.descricao FROM pessoa p, categoria c WHERE p.categ_id = c.categ_id and p.categ_id = 12;
+
+SELECT * FROM pessoa WHERE UPPER(nome) = 'Joao 062000';
+
+CREATE INDEX pessoa_nome2_ix ON pessoa(UPPER(nome));
+SELECT * FROM pessoa WHERE UPPER(nome) = 'Joao 062000';
 
