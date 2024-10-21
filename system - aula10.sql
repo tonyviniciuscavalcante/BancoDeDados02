@@ -3659,3 +3659,21 @@ SELECT *
 FROM pessoa
 WHERE cor_olhos = 'A';
 
+EXPLAIN PLAN FOR SELECT * FROM PESSOA WHERE NOME =
+'Joao 065000';
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());
+
+EXPLAIN PLAN SET STATEMENT_ID = 'Plano_01' FOR
+ SELECT * FROM PESSOA WHERE NOME = 'Joao 062000';
+SELECT PLAN_TABLE_OUTPUT
+ FROM TABLE(DBMS_XPLAN.DISPLAY(NULL,'Plano_01'));
+
+SELECT PLAN_TABLE_OUTPUT FROM
+TABLE(DBMS_XPLAN.DISPLAY( NULL,'Plano_01','ADVANCED'));
+
+-- Alterar o seu nome
+ALTER INDEX nome_índice RENAME TO novo_nome_índice;
+-- Fazer o REBUILD do index quando o mesmo estiver inválido
+ALTER INDEX nome_índice REBUILD;
+-- Para eliminar um índice, uƟlizamos o comando:
+DROP INDEX nome_índice;
