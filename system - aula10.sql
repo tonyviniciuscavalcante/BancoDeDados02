@@ -3413,19 +3413,65 @@ END Esporte_Pkg;
 
 CREATE OR REPLACE PACKAGE BODY Esporte_Pkg AS
     FUNCTION Get_Atleta_By_Clube(p_id IN NUMBER) RETURN SYS_REFCURSOR IS
-    c_atleta SYS_REFCURSOR
+        c_atleta SYS_REFCURSOR
     BEGIN
         OPEN c_atleta FOR
             SELECT a.id, a.nome, a.salario, a.dataNasc
-                FROM atleta a
-        WHERE a.id_clube = p.id_clube;
+            FROM atleta a
+            WHERE a.id_clube = p.id_clube;
 
         RETURN c_atleta
     END Get_Atleta_By_Clube;
 
-FUNCTION Count_Modalidade_By_Atleta(id_atleta IN NUMBER) RETURN NUMBER IS x_count NUMBER
+    FUNCTION Count_Modalidade_By_Atleta(id_atleta IN NUMBER) RETURN NUMBER IS
+        x_count NUMBER
+    BEGIN
+
+    END Count_Modalidade_By_Atleta;
+
+
+PROCEDURE Add_Atleta(
+        p_id IN atleta.id%TYPE, p_nome IN atleta.nome%TYPE,
+        p_cpf IN atleta.cpf%TYPE, p_salario IN atleta.salario%TYPE,
+        p_id_clube IN atleta.id_clube%TYPE
+    ) IS
+    BEGIN
+        INSERT INTO Atleta (id nome, cpf, salario, id_clube)
+        VALUES (p_id, p_cpf, p_salario, p_id_clube, p_nome);
+    END Add_Atleta;
+
+    PROCEDURE Add_Clube_id IN
+    clube.id%
+    TYPE
+
+
+DECLARE
+    v_atleta SYS_REFCURSOR,
+    v_id_atleta NUMBER,
+    v_nome_atleta VARCHAR2(100) ,
+    v_salario NUMBER,
+    v_datanasc DATE
 BEGIN
+v_atleta
 
-END Count_Modalidade_By_Atleta;
 
+DECLARE
+    v_qtd_modalidades NUMBER;
+    BEGIN
+    v_qtd_modalidades := Esporte_Pkg.Count_Modalidade_By_Atleta(1);
+
+    DBMS_OUTPUT.PUT_LINE('O atleta pratica' || v_qtd_modalidades || 'modalidades');
+END;
+
+
+BEGIN
+   Esporte_Pkg.Add_Atleta(111, 'Carlos Pereira', '525-6548-784', 8720,8);
+   DBMS_OUTPUT.PUT_LINE('Novo atleta adicionado com sucesso';
+END;
+
+
+BEGIN
+    Esporte_Pkg.Add_Clube(41, 'Sāo Carlos Clube', 5);
+    DBMS_OUTPUT.PUT_LINE('Novo clube adicionado com sucesso');
+END;
 
